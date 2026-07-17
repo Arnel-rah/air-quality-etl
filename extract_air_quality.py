@@ -27,7 +27,6 @@ def api_get(endpoint: str, params: Optional[Dict[str, Any]] = None, retries: int
     if params is None:
         params = {}
     params["appid"] = OPENWEATHER_API_KEY
-    params["units"] = "metric"
 
     url = f"{BASE_URL}/{endpoint}"
     for attempt in range(1, retries + 1):
@@ -48,29 +47,35 @@ def api_get(endpoint: str, params: Optional[Dict[str, Any]] = None, retries: int
     return None
 
 
-def extract_current_weather(latitude: float, longitude: float, location_name: str) -> Optional[Dict[str, Any]]:
-    """Fetch current, real-time weather for a given location."""
-    data = api_get("weather", {"lat": latitude, "lon": longitude})
+def extract_air_quality(latitude: float, longitude: float, location_name: str) -> Optional[Dict[str, Any]]:
+    """Fetch current air quality (AQI + pollutant concentrations) for a given location."""
+    data = api_get("air_pollution", {"lat": latitude, "lon": longitude})
     if not data:
         return None
 
-    main = data.get("main", {})
-    wind = data.get("wind", {})
-    weather_desc = (data.get("weather") or [{}])[0]
-    dt = data.get("dt")
+    results = data.get("list", [])
+    if not results:
+        return None
+
+    entry = results[0]
+    dt = entry.get("dt")
+    aqi = (entry.get("main") or {}).get("aqi")
+    components = entry.get("components", {})
 
     return {
         "timestamp": datetime.fromtimestamp(dt, tz=timezone.utc).isoformat() if dt else None,
         "location": location_name,
         "latitude": latitude,
         "longitude": longitude,
-        "temp": main.get("temp"),
-        "feels_like": main.get("feels_like"),
-        "humidity": main.get("humidity"),
-        "pressure": main.get("pressure"),
-        "wind_speed": wind.get("speed"),
-        "weather_main": weather_desc.get("main"),
-        "weather_description": weather_desc.get("description"),
+        "aqi": aqi,
+        "co": components.get("co"),
+        "no": components.get("no"),
+        "no2": components.get("no2"),
+        "o3": components.get("o3"),
+        "so2": components.get("so2"),
+        "pm2_5": components.get("pm2_5"),
+        "pm10": components.get("pm10"),
+        "nh3": components.get("nh3"),
     }
 
 
@@ -81,13 +86,13 @@ def run_extraction():
 
     records: List[Dict[str, Any]] = []
     for loc in locations:
-        print(f"Fetching current weather for {loc['name']}...")
-        record = extract_current_weather(loc["lat"], loc["lon"], loc["name"])
+        print(f"Fetching air quality for {loc['name']}...")
+        record = extract_air_quality(loc["lat"], loc["lon"], loc["name"])
         if record:
             records.append(record)
 
     if records:
-        supabase.table("weather_realtime").upsert(
+        supabase.table("air_quality_realtime").upsert(
             records, on_conflict="timestamp,location"
         ).execute()
         print(f"Success: {len(records)} records upserted")
