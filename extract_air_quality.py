@@ -1,7 +1,9 @@
 import os
+import json
 import time
 import requests
 from datetime import datetime, timezone
+from pathlib import Path
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from typing import Any, Dict, List, Optional
@@ -20,10 +22,26 @@ if not OPENWEATHER_API_KEY:
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 BASE_URL = "https://api.openweathermap.org/data/2.5"
+LOCATIONS_FILE = Path(__file__).parent / "locations.json"
+
+
+def load_locations() -> List[Dict[str, Any]]:
+    if not LOCATIONS_FILE.exists():
+        raise FileNotFoundError(f"Locations file not found: {LOCATIONS_FILE}")
+
+    with open(LOCATIONS_FILE, "r", encoding="utf-8") as f:
+        locations = json.load(f)
+
+    required_keys = {"name", "lat", "lon"}
+    for loc in locations:
+        missing = required_keys - loc.keys()
+        if missing:
+            raise ValueError(f"Location entry {loc} is missing keys: {missing}")
+
+    return locations
 
 
 def api_get(endpoint: str, params: Optional[Dict[str, Any]] = None, retries: int = 3) -> Optional[dict]:
-    """Generic call to the OpenWeatherMap free API with error handling and retries."""
     if params is None:
         params = {}
     params["appid"] = OPENWEATHER_API_KEY
@@ -46,8 +64,8 @@ def api_get(endpoint: str, params: Optional[Dict[str, Any]] = None, retries: int
             time.sleep(2 * attempt)
     return None
 
+
 def extract_air_quality(latitude: float, longitude: float, location_name: str) -> Optional[Dict[str, Any]]:
-    """Fetch current air quality (AQI + pollutant concentrations) for a given location."""
     data = api_get("air_pollution", {"lat": latitude, "lon": longitude})
     if not data:
         return None
@@ -82,9 +100,7 @@ def extract_air_quality(latitude: float, longitude: float, location_name: str) -
 
 
 def run_extraction():
-    locations = [
-        {"name": "Antananarivo", "lat": -18.8792, "lon": 47.5079},
-    ]
+    locations = load_locations()
 
     records: List[Dict[str, Any]] = []
     for loc in locations:
@@ -92,6 +108,7 @@ def run_extraction():
         record = extract_air_quality(loc["lat"], loc["lon"], loc["name"])
         if record:
             records.append(record)
+        time.sleep(1)
 
     if records:
         supabase.table("air_quality_realtime").upsert(
