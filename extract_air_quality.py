@@ -46,7 +46,6 @@ def api_get(endpoint: str, params: Optional[Dict[str, Any]] = None, retries: int
             time.sleep(2 * attempt)
     return None
 
-
 def extract_air_quality(latitude: float, longitude: float, location_name: str) -> Optional[Dict[str, Any]]:
     """Fetch current air quality (AQI + pollutant concentrations) for a given location."""
     data = api_get("air_pollution", {"lat": latitude, "lon": longitude})
@@ -58,12 +57,15 @@ def extract_air_quality(latitude: float, longitude: float, location_name: str) -
         return None
 
     entry = results[0]
-    dt = entry.get("dt")
     aqi = (entry.get("main") or {}).get("aqi")
     components = entry.get("components", {})
 
+    hour_timestamp = datetime.now(timezone.utc).replace(
+        minute=0, second=0, microsecond=0
+    ).isoformat()
+
     return {
-        "timestamp": datetime.fromtimestamp(dt, tz=timezone.utc).isoformat() if dt else None,
+        "timestamp": hour_timestamp,
         "location": location_name,
         "latitude": latitude,
         "longitude": longitude,
