@@ -20,8 +20,11 @@ def upsert_dim_city(cities: List[str]) -> Dict[str, int]:
     print(f"  [dim_city] {len(records)} enregistrements à upserter")
     if records:
         supabase.table("dim_city").upsert(records, on_conflict="city_name").execute()
-    result = cast(List[Dict[str, Any]], supabase.table("dim_city").select("city_id, city_name").execute().data)
-    print(f"  [dim_city] {len(result)} lignes en base")
+    try:                                                          # ← ICI
+        result = cast(List[Dict[str, Any]], supabase.table("dim_city").select("city_id, city_name").execute().data)
+    except Exception as e:
+        print(f"  [dim_city] Erreur lors de la lecture : {e}")
+        raise
     return {str(row["city_name"]): int(row["city_id"]) for row in result}
 
 
@@ -34,8 +37,11 @@ def upsert_dim_parameter(df: pd.DataFrame) -> Dict[str, int]:
     print(f"  [dim_parameter] {len(records)} enregistrements à upserter")
     if records:
         supabase.table("dim_parameter").upsert(records, on_conflict="parameter_name").execute()
-    result = cast(List[Dict[str, Any]], supabase.table("dim_parameter").select("parameter_id, parameter_name").execute().data)
-    print(f"  [dim_parameter] {len(result)} lignes en base")
+    try:                                                          # ← ICI
+        result = cast(List[Dict[str, Any]], supabase.table("dim_parameter").select("parameter_id, parameter_name").execute().data)
+    except Exception as e:
+        print(f"  [dim_parameter] Erreur lors de la lecture : {e}")
+        raise
     return {str(row["parameter_name"]): int(row["parameter_id"]) for row in result}
 
 
@@ -56,16 +62,30 @@ def upsert_dim_date(timestamps: pd.Series) -> Dict[pd.Timestamp, int]:
     print(f"  [dim_date] {len(records)} enregistrements à upserter")
     if records:
         supabase.table("dim_date").upsert(records, on_conflict="full_timestamp").execute()
-    result = cast(List[Dict[str, Any]], supabase.table("dim_date").select("date_id, full_timestamp").execute().data)
-    print(f"  [dim_date] {len(result)} lignes en base")
+    try:                                                          # ← ICI
+        result = cast(List[Dict[str, Any]], supabase.table("dim_date").select("date_id, full_timestamp").execute().data)
+    except Exception as e:
+        print(f"  [dim_date] Erreur lors de la lecture : {e}")
+        raise
     return {
         pd.to_datetime(row["full_timestamp"], utc=True): int(row["date_id"])
         for row in result
     }
 
+def detect_outliers(df: pd.DataFrame) -> pd.DataFrame:
+  
+    mask = df['value'].between(0, 500)
+    n_rejected = (~mask).sum()
+    if n_rejected > 0:
+        print(f"[outliers] {n_rejected} ligne(s) hors bornes AQI (0-500) écartée(s)")
+    return df[mask]
 
 def run():
-    data = supabase.table("raw_air_quality").select("*").limit(5000).execute().data
+    try:
+        data = supabase.table("raw_air_quality").select("*").limit(5000).execute().data
+    except Exception as e:
+        print(f"Erreur lors de la lecture de raw_air_quality : {e}")
+        raise
     df = pd.DataFrame(data)
     print(f"[raw_air_quality] {len(df)} lignes lues")
 
