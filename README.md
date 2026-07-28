@@ -9,7 +9,7 @@ Les données sont stockées de manière structurée (zone brute + zone nettoyée
 Le pipeline est entièrement automatisé via **GitHub Actions** et continue de tourner après le rendu.
 
 
-2. Villes couvertes
+## 2. Villes couvertes
 
 | Ville | Latitude | Longitude | Pays |
 |---|---|---|---|
@@ -80,68 +80,67 @@ Le projet n'utilise pas de fichiers plats `raw/`/`clean/` : la zone brute/propre
 
 
 Les identifiants de connexion (SUPABASE_URL, SUPABASE_KEY, WAQI_API_TOKEN) sont exclusivement stockés dans les GitHub Secrets et dans un fichier .env local non versionné. Aucune clé n'apparaît dans le code ni dans l'historique Git.
+## 6. Période couverte
 
-## 6. PÃ©riode couverte
-
-- **DÃ©but** : 23 juillet 2026 Ã  04h43 (UTC)
+- **Début** : 23 juillet 2026 à 04h43 (UTC)
 - **Fin** : en cours (collecte active)
-- **FrÃ©quence** : toutes les heures
+- **Fréquence** : toutes les heures
 
-## SchÃ©ma du Data Warehouse
+## Schéma du Data Warehouse
 
-ModÃ©lisation en **schÃ©ma Ã©toile**.
+Modélisation en **schéma étoile**.
 
-### Table de faits â€” `fact_air_quality`
+### Table de faits — `fact_air_quality`
 
 | Colonne | Type | Description |
 |---|---|---|
 | `id` | INTEGER (PK) | Identifiant unique |
-| `city_id` | INTEGER (FK) | RÃ©fÃ©rence vers `dim_city` |
-| `parameter_id` | INTEGER (FK) | RÃ©fÃ©rence vers `dim_parameter` |
-| `date_id` | INTEGER (FK) | RÃ©fÃ©rence vers `dim_date` |
-| `value` | FLOAT | Valeur mesurÃ©e (AQI ou polluant) |
+| `city_id` | INTEGER (FK) | Référence vers `dim_city` |
+| `parameter_id` | INTEGER (FK) | Référence vers `dim_parameter` |
+| `date_id` | INTEGER (FK) | Référence vers `dim_date` |
+| `value` | FLOAT | Valeur mesurée (AQI ou polluant) |
 | `inserted_at` | TIMESTAMP | Date d'insertion en base |
 
-### Dimension ville â€” `dim_city`
+### Dimension ville — `dim_city`
 
 | Colonne | Type | Description |
 |---|---|---|
 | `id` | INTEGER (PK) | Identifiant unique |
 | `name` | VARCHAR | Nom de la ville |
 | `country` | VARCHAR | Pays (France) |
-| `latitude` | FLOAT | Latitude gÃ©ographique |
-| `longitude` | FLOAT | Longitude gÃ©ographique |
+| `latitude` | FLOAT | Latitude géographique |
+| `longitude` | FLOAT | Longitude géographique |
 
-### Dimension temps â€” `dim_date`
+### Dimension temps — `dim_date`
 
 | Colonne | Type | Description |
 |---|---|---|
 | `id` | INTEGER (PK) | Identifiant unique |
-| `date` | DATE | Date complÃ¨te |
-| `hour` | INTEGER | Heure (0â€“23) |
+| `date` | DATE | Date complète |
+| `hour` | INTEGER | Heure (0–23) |
 | `day_of_week` | VARCHAR | Jour de la semaine |
 | `is_weekend` | BOOLEAN | Vrai si samedi ou dimanche |
-| `month` | INTEGER | Mois (1â€“12) |
-| `year` | INTEGER | AnnÃ©e |
+| `month` | INTEGER | Mois (1–12) |
+| `year` | INTEGER | Année |
 
-### Dimension paramÃ¨tre â€” `dim_parameter`
+### Dimension paramètre — `dim_parameter`
 
 | Colonne | Type | Description |
 |---|---|---|
 | `id` | INTEGER (PK) | Identifiant unique |
 | `name` | VARCHAR | Nom du polluant (aqi_global, pm25, pm10, no2, so2, co, o3) |
-| `unit` | VARCHAR | UnitÃ© de mesure (AQI) |
-| `description` | VARCHAR | Description du paramÃ¨tre |
+| `unit` | VARCHAR | Unité de mesure (AQI) |
+| `description` | VARCHAR | Description du paramètre |
 
 ---
 
 ## Trous connus
 
-Aucun trou identifiÃ© Ã  ce jour. Les Ã©carts Ã©ventuels peuvent Ãªtre dus Ã  :
+Aucun trou identifié à ce jour. Les écarts éventuels peuvent être dus à :
 
 | Cause | Impact |
 |---|---|
-| IndisponibilitÃ© de l'API WAQI | DonnÃ©es manquantes pour certaines heures |
-| Polluant non disponible pour une ville | Valeur absente pour ce paramÃ¨tre |
+| Indisponibilité de l'API WAQI | Données manquantes pour certaines heures |
+| Polluant non disponible pour une ville | Valeur absente pour ce paramètre |
 
 ---
