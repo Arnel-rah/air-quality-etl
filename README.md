@@ -136,11 +136,17 @@ Modélisation en **schéma étoile**.
 
 ## Trous connus
 
-Aucun trou identifié à ce jour. Les écarts éventuels peuvent être dus à :
 
-| Cause | Impact |
-|---|---|
-| Indisponibilité de l'API WAQI | Données manquantes pour certaines heures |
-| Polluant non disponible pour une ville | Valeur absente pour ce paramètre |
+| Ville | Heures présentes | Heures attendues | Heures manquantes |
+|---|---|---|---|
+| Lyon | 58 | 132 | 74 |
+| Marseille | 58 | 131 | 73 |
+| Nice | 58 | 131 | 73 |
+| Paris | 59 | 131 | 72 |
+| Toulouse | 58 | 131 | 73 |
+
+Aucune interruption détectée — toutes les exécutions 
+GitHub Actions sont vertes.
+
 
 ---
