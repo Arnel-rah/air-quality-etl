@@ -2,29 +2,26 @@
 
 ## 1. Objectif
 
-Ce projet consiste à déployer un pipeline automatisé qui collecte en continu (24h/24) les données de qualité de l'air (AQI) pour 5 villes françaises.  
+Ce projet déploie un pipeline automatisé qui collecte, 24h/24, des données de qualité de l'air (AQI) pour **5 villes françaises**, les stocke dans une base **Supabase (PostgreSQL)**, puis les restructure selon une **modélisation dimensionnelle en étoile**. Le pipeline est orchestré par **GitHub Actions** et conçu pour continuer à tourner après le rendu, afin d'alimenter le cours IA1 au fil de l'eau.
 
-Les données sont stockées de manière structurée (zone brute + zone nettoyée) puis chargées dans un **data warehouse dimensionnel** hébergé sur Supabase (schéma en étoile), afin d’être consommées par le cours IA1.
+Ce document décrit précisément le contenu du stockage : villes couvertes, structure des données, schéma du warehouse, période couverte et modalités de connexion — de façon à ce que toute personne extérieure au groupe puisse exploiter les données sans ambiguïté.
 
-Le pipeline est entièrement automatisé via **GitHub Actions** et continue de tourner après le rendu.
+## 2. Villes choisies
 
+| Ville     | Pays   | Latitude | Longitude |
+|-----------|--------|----------|-----------|
+| Paris     | France | 48.8566  | 2.3522    |
+| Marseille | France | 43.2965  | 5.3698    |
+| Lyon      | France | 45.7640  | 4.8357    |
+| Toulouse  | France | 43.6047  | 1.4442    |
+| Nice      | France | 43.7102  | 7.2620    |
 
-## 2. Villes couvertes
-
-| Ville | Latitude | Longitude | Pays |
-|---|---|---|---|
-| Paris | 48.8566 | 2.3522 | France |
-| Marseille | 43.2965 | 5.3698 | France |
-| Lyon | 45.7640 | 4.8357 | France |
-| Toulouse | 43.6047 | 1.4442 | France |
-| Nice | 43.7102 | 7.2620 | France |
-
-Ces cinq villes couvrent des profils géographiques et de pollution variés....
+Ces cinq villes couvrent des profils géographiques et de pollution variés (grande métropole intérieure, villes portuaires méditerranéennes, agglomération du sud-ouest), ce qui permet des comparaisons pertinentes pour les analyses en aval.
 
 ## 3. Architecture du pipeline
- 
+
 Voir **[ARCHITECTURE.md](ARCHITECTURE.md)** pour le détail complet de la stack et les justifications techniques.
- 
+
 ```
 API WAQI (World Air Quality Index)
         │  collecte horaire par ville
@@ -42,6 +39,7 @@ transform.py (script de transformation, idempotent)
 Supabase — Data Warehouse (schéma en étoile)
    dim_city · dim_parameter · dim_date · fact_air_quality
 ```
+
 | Composant       | Choix                  | Justification                                                     |
 |-----------------|------------------------|--------------------------------------------------------------------|
 | Source de données | API WAQI              | Mesures d'indices et de polluants atmosphériques fiables et standardisées pour les 5 métropoles ciblées |
@@ -49,13 +47,13 @@ Supabase — Data Warehouse (schéma en étoile)
 | Stockage brut   | Table `raw_air_quality` (Supabase) | Conserve l'historique complet et immuable des réponses API brutes, garantit la traçabilité des données |
 | Data Warehouse  | Supabase (PostgreSQL)  | Retenu après des problèmes de timeout rencontrés sur une première instance Neon ; offre une base PostgreSQL cloud stable et directement accessible |
 | Modélisation    | Schéma en étoile       | Sépare les données quantitatives (faits) des contextes descriptifs (`dim_city`, `dim_parameter`, `dim_date`), ce qui optimise les requêtes analytiques et la préparation des données pour IA1 |
- 
+
 > Historique d'exécution : le workflow `.github/workflows/pipeline.yml` s'exécute automatiquement selon une planification cron (déclenchement `Scheduled`), sans intervention manuelle. Au [date de vérification], l'historique GitHub Actions du dépôt comptait déjà plusieurs dizaines d'exécutions réussies. [Équipe : compléter avec le nombre exact de runs et confirmer qu'ils s'étalent sur au moins 5 jours différents, via l'onglet **Actions** du dépôt.]
 
 ## 4. Contrat de données – table `raw_air_quality`
- 
+
 Le projet n'utilise pas de fichiers plats `raw/`/`clean/` : la zone brute/propre est la table Supabase `raw_air_quality`, qui joue ce rôle et sert de source unique pour reconstruire le warehouse à chaque exécution de `transform.py`.
- 
+
 | Colonne     | Type     | Description / Unité                                                        | Exemple                  |
 |-------------|----------|------------------------------------------------------------------------------|---------------------------|
 | `id`        | bigint   | Identifiant technique auto-incrémenté                                       | 1                         |
@@ -65,82 +63,120 @@ Le projet n'utilise pas de fichiers plats `raw/`/`clean/` : la zone brute/propre
 | `value`     | numeric  | Valeur mesurée, sur l'échelle AQI fournie par WAQI                            | 13.0                      |
 | `unit`      | text     | Unité déclarée par la source                                                  | AQI                       |
 | `inserted_at` | timestamptz | Horodatage technique d'insertion en base                                | 2026-07-23T07:54:20+00:00 |
- 
+
 **Granularité** : une ligne par ville + heure + polluant (format long). Pour obtenir une vue "une ligne par ville-heure avec un polluant par colonne", il suffit de pivoter cette table sur `parameter`.
- 
+
 **Déduplication** : contrainte d'unicité Supabase sur `(city, parameter, timestamp)` — un upsert réinsère la même mesure sans jamais créer de doublon, même en cas de relance du script.
- 
+
 **Qualité des données** : toute valeur en dehors de la plage `[0, 500]` (bornes de l'échelle AQI) est automatiquement écartée par la fonction `detect_outliers` avant chargement dans le warehouse.
 
+## 5. Data Warehouse – Modélisation dimensionnelle
 
-## 5. Connexion a la base 
+### Modèle choisi : schéma en étoile
 
-## Type de base : PostgreSQL managé (Supabase)
-## Projet Supabase : air-quality-etl
+Le schéma retenu place `fact_air_quality` au centre, reliée à trois dimensions : `dim_city`, `dim_parameter` et `dim_date`. Choisir un polluant par ligne (plutôt qu'une colonne par polluant) rend le modèle extensible : si l'API WAQI ajoute un nouveau polluant demain, il suffit d'une nouvelle ligne dans `dim_parameter`, sans modifier le schéma de la table de faits. Ce choix respecte strictement les règles vues en cours : aucune mesure dans les dimensions, aucune colonne descriptive dans la table de faits.
 
+### Table de faits : `fact_air_quality`
 
-Les identifiants de connexion (SUPABASE_URL, SUPABASE_KEY, WAQI_API_TOKEN) sont exclusivement stockés dans les GitHub Secrets et dans un fichier .env local non versionné. Aucune clé n'apparaît dans le code ni dans l'historique Git.
+| Colonne        | Type      | Rôle                                            |
+|----------------|-----------|--------------------------------------------------|
+| `id`           | bigserial | Clé primaire technique                            |
+| `city_id`      | integer   | Clé étrangère → `dim_city`                       |
+| `parameter_id` | integer   | Clé étrangère → `dim_parameter`                  |
+| `date_id`      | integer   | Clé étrangère → `dim_date`                       |
+| `value`        | numeric   | Mesure (indice AQI ou concentration du polluant) |
+| `inserted_at`  | timestamptz | Horodatage technique d'insertion                |
+
+Contrainte d'unicité : `(city_id, parameter_id, date_id)`.
+
+### Dimension ville : `dim_city`
+
+| Colonne     | Type   | Description             |
+|-------------|--------|---------------------------|
+| `city_id`   | serial | Clé primaire               |
+| `city_name` | text   | Nom de la ville (unique)   |
+| `country`   | text   | Pays (`FR` par défaut)     |
+
+> **Limite connue et assumée** : les coordonnées latitude/longitude ne sont pour l'instant pas stockées dans cette table, mais uniquement documentées en section 2 de ce README. [Équipe : à corriger avant le rendu — ajout de deux colonnes `latitude` et `longitude` à `dim_city`, remplies avec les valeurs de la section 2.]
+
+### Dimension polluant : `dim_parameter`
+
+| Colonne          | Type   | Description                                       |
+|------------------|--------|------------------------------------------------------|
+| `parameter_id`   | serial | Clé primaire                                          |
+| `parameter_name` | text   | Nom du polluant (`aqi_global`, `pm25`, `pm10`, `no2`, `so2`, `co`, `o3`) |
+| `unit`           | text   | Unité déclarée par la source                          |
+
+### Dimension temps : `dim_date`
+
+| Colonne          | Type        | Description                                     |
+|------------------|-------------|----------------------------------------------------|
+| `date_id`        | serial      | Clé primaire                                        |
+| `full_timestamp` | timestamptz | Horodatage complet (unique)                         |
+| `date`           | date        | Date                                                |
+| `year`           | integer     | Année                                               |
+| `month`          | integer     | Mois (1–12)                                         |
+| `day`            | integer     | Jour du mois                                        |
+| `hour`           | integer     | Heure (0–23)                                        |
+| `day_of_week`    | integer     | Jour de la semaine (0 = lundi … 6 = dimanche)        |
+
+> **Limite connue et assumée** : la colonne `is_weekend` n'est pas matérialisée. Elle se déduit directement en SQL via `day_of_week IN (5, 6)`. [Équipe : à corriger avant le rendu si le temps le permet — ajout d'une colonne `is_weekend boolean`.]
+
+### Cohérence des volumes
+
+Le modèle étant en format long (un polluant par ligne), le nombre de lignes attendu dans la table de faits suit la formule :
+
+> **nombre de villes × nombre d'heures couvertes × nombre de polluants mesurés (7)**
+
+et non `villes × heures` seul, comme dans un modèle large classique. Cette particularité est documentée ici pour éviter toute ambiguïté lors de la lecture par IA1.
+
 ## 6. Période couverte
 
-- **Début** : 23 juillet 2026 à 04h43 (UTC)
-- **Fin** : en cours (collecte active)
-- **Fréquence** : toutes les heures
+- **Backfill** : [Équipe : indiquer ici la période réelle couverte par le script de backfill — du `YYYY-MM-DD` au `YYYY-MM-DD` — après vérification dans `dim_date`]
+- **Collecte en continu** : depuis le [Équipe : date de mise en route effective du workflow GitHub Actions en cron horaire]
 
-## Schéma du Data Warehouse
+## 7. Trous connus
 
-Modélisation en **schéma étoile**.
+| Période / Heure | Ville(s) concernée(s) | Cause |
+|-------------------|-------------------------|--------|
+| [Équipe : à documenter après vérification des logs GitHub Actions] | | |
 
-### Table de faits — `fact_air_quality`
+> Aucune donnée manquante n'a été reconstituée artificiellement : les trous reflètent fidèlement les échecs de collecte réels (quota API, erreurs réseau, etc.).
 
-| Colonne | Type | Description |
-|---|---|---|
-| `id` | INTEGER (PK) | Identifiant unique |
-| `city_id` | INTEGER (FK) | Référence vers `dim_city` |
-| `parameter_id` | INTEGER (FK) | Référence vers `dim_parameter` |
-| `date_id` | INTEGER (FK) | Référence vers `dim_date` |
-| `value` | FLOAT | Valeur mesurée (AQI ou polluant) |
-| `inserted_at` | TIMESTAMP | Date d'insertion en base |
+## 8. Connexion à la base de données
 
-### Dimension ville — `dim_city`
+- **Type de base** : PostgreSQL managé (Supabase)
+- **Projet Supabase** : `air-quality-etl`
+- **Tables** :
+  - `raw_air_quality` — zone brute/propre, une ligne par ville + heure + polluant
+  - `dim_city`, `dim_parameter`, `dim_date`, `fact_air_quality` — Data Warehouse
+- **Script de collecte** : `extract.py`, déclenché automatiquement par GitHub Actions
+- **Script de transformation et chargement** : `transform.py`, rejouable et idempotent (upserts sur clés naturelles)
 
-| Colonne | Type | Description |
-|---|---|---|
-| `id` | INTEGER (PK) | Identifiant unique |
-| `name` | VARCHAR | Nom de la ville |
-| `country` | VARCHAR | Pays (France) |
-| `latitude` | FLOAT | Latitude géographique |
-| `longitude` | FLOAT | Longitude géographique |
+Les identifiants de connexion (`SUPABASE_URL`, `SUPABASE_KEY`, `WAQI_API_TOKEN`) sont exclusivement stockés dans les **GitHub Secrets** et dans un fichier `.env` local non versionné. Aucune clé n'apparaît dans le code ni dans l'historique Git.
 
-### Dimension temps — `dim_date`
+## 9. Relancer le pipeline
 
-| Colonne | Type | Description |
-|---|---|---|
-| `id` | INTEGER (PK) | Identifiant unique |
-| `date` | DATE | Date complète |
-| `hour` | INTEGER | Heure (0–23) |
-| `day_of_week` | VARCHAR | Jour de la semaine |
-| `is_weekend` | BOOLEAN | Vrai si samedi ou dimanche |
-| `month` | INTEGER | Mois (1–12) |
-| `year` | INTEGER | Année |
+```bash
+python extract.py       # collecte les mesures horaires depuis WAQI
+python transform.py     # reconstruit le warehouse depuis raw_air_quality
+```
 
-### Dimension paramètre — `dim_parameter`
+Ces deux étapes sont également exécutées automatiquement par le workflow GitHub Actions défini dans `.github/workflows/`.
 
-| Colonne | Type | Description |
-|---|---|---|
-| `id` | INTEGER (PK) | Identifiant unique |
-| `name` | VARCHAR | Nom du polluant (aqi_global, pm25, pm10, no2, so2, co, o3) |
-| `unit` | VARCHAR | Unité de mesure (AQI) |
-| `description` | VARCHAR | Description du paramètre |
+## 10. Structure du dépôt
 
----
-
-## Trous connus
-
-Aucun trou identifié à ce jour. Les écarts éventuels peuvent être dus à :
-
-| Cause | Impact |
-|---|---|
-| Indisponibilité de l'API WAQI | Données manquantes pour certaines heures |
-| Polluant non disponible pour une ville | Valeur absente pour ce paramètre |
-
----
+```
+.
+├── .github/
+│   └── workflows/          # Orchestration GitHub Actions (cron horaire)
+├── ARCHITECTURE.md
+├── README.md
+├── sql/
+│   └── schema.sql          # Définition des tables du warehouse
+├── scripts/
+│   ├── extract.py          # Collecte des données via l'API WAQI
+│   └── transform.py        # Transformation et chargement du warehouse
+├── .env.example
+└── docs/                   # Captures d'écran, preuves d'exécution
+```
