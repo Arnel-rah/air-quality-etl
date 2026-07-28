@@ -71,3 +71,12 @@ Le projet n'utilise pas de fichiers plats `raw/`/`clean/` : la zone brute/propre
 **Déduplication** : contrainte d'unicité Supabase sur `(city, parameter, timestamp)` — un upsert réinsère la même mesure sans jamais créer de doublon, même en cas de relance du script.
  
 **Qualité des données** : toute valeur en dehors de la plage `[0, 500]` (bornes de l'échelle AQI) est automatiquement écartée par la fonction `detect_outliers` avant chargement dans le warehouse.
+
+
+## 5. Connexion a la base 
+
+## Type de base : PostgreSQL managé (Supabase)
+## Projet Supabase : air-quality-etl
+
+
+Les identifiants de connexion (SUPABASE_URL, SUPABASE_KEY, WAQI_API_TOKEN) sont exclusivement stockés dans les GitHub Secrets et dans un fichier .env local non versionné. Aucune clé n'apparaît dans le code ni dans l'historique Git.
