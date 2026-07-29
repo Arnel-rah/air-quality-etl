@@ -166,26 +166,7 @@ Ces deux étapes sont également exécutées automatiquement par le workflow Git
 
 ## 10. Structure du dépôt
 
-<<<<<<< HEAD
----
 
-## Trous connus
-
-
-| Ville | Heures présentes | Heures attendues | Heures manquantes |
-|---|---|---|---|
-| Lyon | 58 | 132 | 74 |
-| Marseille | 58 | 131 | 73 |
-| Nice | 58 | 131 | 73 |
-| Paris | 59 | 131 | 72 |
-| Toulouse | 58 | 131 | 73 |
-
-Aucune interruption détectée — toutes les exécutions 
-GitHub Actions sont vertes.
-
-
----
-=======
 ```
 .
 ├── .github/
@@ -200,4 +181,3 @@ GitHub Actions sont vertes.
 ├── .env.example
 └── docs/                   # Captures d'écran, preuves d'exécution
 ```
->>>>>>> a84184d7a203420470f6f9586a29fa76d450d1cd
