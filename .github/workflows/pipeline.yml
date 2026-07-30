@@ -8,9 +8,12 @@ on:
 jobs:
   etl:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -22,13 +25,21 @@ jobs:
 
       - name: Extract Raw Data
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           WAQI_API_TOKEN: ${{ secrets.WAQI_API_TOKEN }}
         run: python scripts/extract.py
 
-      - name: Transform and Load to DW
+      - name: Transform to Clean
+        run: python scripts/transform.py
+
+      - name: Load to Data Warehouse
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        run: python scripts/transform.py
+        run: python scripts/load_warehouse.py
+
+      - name: Commit raw and clean files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add raw/ clean/
+          git diff --staged --quiet || (git commit -m "Update air quality data - $(date -u)" && git pull --rebase && git push)
