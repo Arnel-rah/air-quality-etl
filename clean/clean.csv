@@ -4,5 +4,10 @@ timestamp,city,parameter,value,unit
 2026-07-30T18:00:00+02:00,Toulouse,aqi_global,67.0,index
 2026-07-30T16:00:00+02:00,Paris,aqi_global,76.0,index
 2026-07-30T19:00:00+02:00,Nice,aqi_global,56.0,index
+2026-07-30T21:00:00+02:00,Marseille,aqi_global,54.0,index
+2026-07-30T21:00:00+02:00,Toulouse,aqi_global,60.0,index
+2026-07-30T20:00:00+02:00,Lyon,aqi_global,25.0,index
 2026-07-30T18:00:00+02:00,Lyon,aqi_global,30.0,index
 2026-07-30T19:00:00+02:00,Toulouse,aqi_global,64.0,index
+2026-07-30T18:00:00+02:00,Paris,aqi_global,103.0,index
+2026-07-30T21:00:00+02:00,Nice,aqi_global,59.0,index
