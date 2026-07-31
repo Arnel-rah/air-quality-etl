@@ -1,40 +1,23 @@
 import json
 import os
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List
 import pandas as pd
 
 CITIES = ["Paris", "Marseille", "Lyon", "Toulouse", "Nice"]
 
-PARAMETER_NAME_ALIASES = {
-    "pm25": "pm2_5",
+CITY_METADATA = {
+    "Paris": {"country": "France", "latitude": 48.8566, "longitude": 2.3522},
+    "Marseille": {
+        "country": "France",
+        "latitude": 43.2965,
+        "longitude": 5.3698,
+    },
+    "Lyon": {"country": "France", "latitude": 45.7640, "longitude": 4.8357},
+    "Toulouse": {"country": "France", "latitude": 43.6047, "longitude": 1.4442},
+    "Nice": {"country": "France", "latitude": 43.7102, "longitude": 7.2620},
 }
 
-INDEX_PARAMETERS = {"aqi", "aqi_global"}
-
-CONCENTRATION_PARAMETERS = {
-    "co",
-    "no",
-    "no2",
-    "o3",
-    "so2",
-    "pm10",
-    "pm2_5",
-    "nh3",
-}
-
-PARAMETER_BOUNDS = {
-    "aqi": (1, 5),
-    "co": (0, 50000),
-    "no": (0, 1000),
-    "no2": (0, 1000),
-    "o3": (0, 1000),
-    "so2": (0, 2000),
-    "pm2_5": (0, 1000),
-    "pm10": (0, 1000),
-    "nh3": (0, 1000),
-}
-
-PARAMETER_MAP = {
+POLLUTANTS_MAP = {
     "pm25": "pm2_5",
     "pm10": "pm10",
     "no2": "no2",
@@ -43,108 +26,118 @@ PARAMETER_MAP = {
     "o3": "o3",
 }
 
+PARAMETER_BOUNDS = {
+    "aqi": (0, 500),
+    "pm2_5": (0, 1000),
+    "pm10": (0, 1000),
+    "no2": (0, 1000),
+    "so2": (0, 2000),
+    "co": (0, 50000),
+    "o3": (0, 1000),
+}
 
-def detect_outliers(df: pd.DataFrame) -> pd.DataFrame:
-    """Filtre les valeurs aberrantes selon les bornes définies."""
-    def get_bounds(p: Any) -> Tuple[float, float]:
-        if isinstance(p, str):
-            return PARAMETER_BOUNDS.get(p, (0, float("inf")))
-        return (0, float("inf"))
 
-    lower = df["parameter"].map(lambda p: get_bounds(p)[0])
-    upper = df["parameter"].map(lambda p: get_bounds(p)[1])
-
-    mask = df["value"].between(lower, upper)
-    n_rejected = (~mask).sum()
-    if n_rejected > 0:
-        print(f"  [outliers] {n_rejected} ligne(s) hors bornes écartée(s)")
-    return df[mask]
+def clean_outliers(df: pd.DataFrame) -> pd.DataFrame:
+  """Remplace par NaN les valeurs hors bornes sans supprimer toute la ligne de mesure."""
+  for param, (low, high) in PARAMETER_BOUNDS.items():
+    if param in df.columns:
+      mask = (df[param] < low) | (df[param] > high)
+      n_outliers = mask.sum()
+      if n_outliers > 0:
+        print(
+            f"  [outliers] {n_outliers} valeur(s) invalide(s) écartée(s) pour"
+            f" '{param}'"
+        )
+        df.loc[mask, param] = None
+  return df
 
 
 def transform():
-    os.makedirs("clean", exist_ok=True)
-    all_records: List[Dict[str, Any]] = []
+  os.makedirs("clean", exist_ok=True)
+  records: List[Dict[str, Any]] = []
 
-    raw_files = [f for f in os.listdir("raw") if f.endswith(".json")]
-    if not raw_files:
-        print("Aucun fichier trouvé dans raw/")
-        return
+  raw_files = [f for f in os.listdir("raw") if f.endswith(".json")]
+  if not raw_files:
+    print("Aucun fichier brut trouvé dans raw/")
+    return
 
-    for filename in raw_files:
-        filepath = os.path.join("raw", filename)
-        with open(filepath, "r", encoding="utf-8") as f:
-            data = json.load(f)
+  for filename in raw_files:
+    filepath = os.path.join("raw", filename)
+    with open(filepath, "r", encoding="utf-8") as f:
+      try:
+        data = json.load(f)
+      except Exception as e:
+        print(f"Erreur de lecture du fichier {filename} : {e}")
+        continue
 
-        city = filename.split("_")[0].capitalize()
-        if city not in CITIES:
-            city = data.get("city", {}).get("name", "Unknown")
+    city = filename.split("_")[0].capitalize()
+    if city not in CITIES:
+      city_raw = data.get("city", {}).get("name", "")
+      for c in CITIES:
+        if c.lower() in city_raw.lower():
+          city = c
+          break
 
-        timestamp = data.get("time", {}).get("iso")
-        if not timestamp:
-            continue
+    if city not in CITIES:
+      continue
 
-        global_aqi = data.get("aqi")
-        if isinstance(global_aqi, (int, float)):
-            all_records.append({
-                "timestamp": timestamp,
-                "city": city,
-                "parameter": "aqi_global",
-                "value": global_aqi,
-                "unit": "AQI",
-            })
+    timestamp = data.get("time", {}).get("iso")
+    if not timestamp:
+      continue
 
-        iaqi = data.get("iaqi", {})
-        for waqi_key, parameter_name in PARAMETER_MAP.items():
-            if waqi_key in iaqi:
-                value = iaqi[waqi_key].get("v")
-                if value is not None:
-                    all_records.append({
-                        "timestamp": timestamp,
-                        "city": city,
-                        "parameter": parameter_name,
-                        "value": value,
-                        "unit": "AQI",
-                    })
+    geo = data.get("city", {}).get("geo", [])
+    if isinstance(geo, list) and len(geo) >= 2:
+      lat, lon = geo[0], geo[1]
+    else:
+      lat = CITY_METADATA[city]["latitude"]
+      lon = CITY_METADATA[city]["longitude"]
 
-    if not all_records:
-        print("Aucune donnée à écrire dans clean/")
-        return
+    record: Dict[str, Any] = {
+        "timestamp": timestamp,
+        "city": city,
+        "latitude": float(lat),
+        "longitude": float(lon),
+        "aqi": data.get("aqi"),
+    }
 
-    df = pd.DataFrame(all_records)
+    iaqi = data.get("iaqi", {})
+    for waqi_key, col_name in POLLUTANTS_MAP.items():
+      if waqi_key in iaqi and "v" in iaqi[waqi_key]:
+        record[col_name] = iaqi[waqi_key]["v"]
+      else:
+        record[col_name] = None
 
-    df = df.dropna(subset=["value", "city", "parameter", "timestamp"])
+    records.append(record)
 
-    df["parameter"] = df["parameter"].replace(PARAMETER_NAME_ALIASES)
+  if not records:
+    print("Aucune donnée extraite depuis raw/")
+    return
 
-    idx_mask = df["parameter"].isin(INDEX_PARAMETERS) & (df["unit"] == "AQI")
-    df.loc[idx_mask, "unit"] = "index"
+  df = pd.DataFrame(records)
 
-    quarantine_mask = df["parameter"].isin(CONCENTRATION_PARAMETERS) & (
-        df["unit"] == "AQI"
-    )
-    if quarantine_mask.sum() > 0:
-        df = df[~quarantine_mask]
+  df = df.dropna(subset=["timestamp", "city"])
 
-    dup_mask = df.duplicated(
-        subset=["city", "parameter", "timestamp"], keep="first"
-    )
-    n_dup = dup_mask.sum()
-    if n_dup > 0:
-        print(f"  [doublons] {n_dup} ligne(s) en double éliminée(s)")
-        df = df[~dup_mask]
+  df = clean_outliers(df)
 
-    df = detect_outliers(df)
+  dup_mask = df.duplicated(subset=["city", "timestamp"], keep="first")
+  n_dup = dup_mask.sum()
+  if n_dup > 0:
+    print(f"  [doublons] {n_dup} enregistrement(s) en double éliminé(s)")
+    df = df[~dup_mask]
 
-    if df.empty:
-        print("Toutes les lignes ont été écartées après nettoyage")
-        return
+  df["dt_tmp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+  df = df.sort_values("dt_tmp").drop(columns=["dt_tmp"])
 
-    clean_path = "clean/clean.csv"
-    df.to_csv(clean_path, index=False)
+  if df.empty:
+    print("Toutes les données ont été rejetées lors du nettoyage.")
+    return
 
-    print(f"Fichier clean reconstruit : {clean_path}")
-    print(f"Nombre de lignes : {len(df)}")
+  clean_path = "clean/clean.csv"
+  df.to_csv(clean_path, index=False)
+
+  print(f"Fichier clean reconstruit avec succès : {clean_path}")
+  print(f"Total : {len(df)} lignes générées.")
 
 
 if __name__ == "__main__":
-    transform()
+  transform()
