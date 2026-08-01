@@ -46,7 +46,7 @@ La zone brute est portée par la table Supabase `raw_air_quality`, qui joue le r
 
 **Qualité des données.** Une fonction `detect_outliers` existe dans `transform.py` et filtre les valeurs hors de la plage `[0, 500]` (bornes de l'échelle AQI). *[Équipe : à confirmer — cette fonction n'est, en l'état du code, pas encore appelée dans le flux d'exécution principal ; vérifier son intégration avant d'affirmer que le filtrage est actif en production.]*
 
-**Note sur les scripts d'extraction.** Le pipeline actif utilise `extract.py` (API WAQI), qui alimente directement `raw_air_quality`. Un second script, `extract_air_quality.py` (API OpenWeatherMap), écrit dans une table distincte (`air_quality_realtime`) non consommée par `transform.py`. *[Équipe : clarifier si ce second script est un reliquat à retirer du dépôt ou s'il a un usage prévu.]*
+**Note sur les scripts d'extraction.** Le pipeline actif utilise `extract.py` (API WAQI), qui alimente directement `raw_air_quality`. Un second script, `extract_air_quality.py` (API OpenWeatherMap), écrit dans une table distincte (`air_quality_realtime`) non consommée par `transform.py`. 
 
 ## 5. Data Warehouse — modélisation dimensionnelle
 
@@ -108,8 +108,6 @@ nombre de villes × nombre d'heures couvertes × nombre de polluants mesurés (7
 ```
 
 et non villes × heures seul, comme dans un modèle large classique. Cette particularité est documentée ici pour éviter toute ambiguïté lors de la lecture par IA1.
-
-## 6. Période couverte
 
 ## 6. Période couverte
 
