@@ -1,8 +1,8 @@
-# 🏛️ Spécifications Techniques & Architecture — Pipeline Data ETL
+#  Spécifications Techniques & Architecture — Pipeline Data ETL
 
 ## 1. Data Lineage & Design Global
 
-Le pipeline d'ingestion et de transformation suit une architecture hybride **ELT/ETL**, garantissant la traçabilité complète des données depuis la source brute jusqu'au Data Warehouse analytique.
+Le pipeline récupère les données brutes de l'API stockées sous leur forme brute pour assurer un suivi complet. Cela garantit qu'aucune donnée n'est perdue et que tout le parcours reste traçable. Puis traitées (nettoyage et filtrage des anomalies) avant d'être chargées dans le Data Warehouse
 
 ```text
 ┌──────────────┐         HTTP GET         ┌────────────────────────────────┐
@@ -33,7 +33,7 @@ Le pipeline d'ingestion et de transformation suit une architecture hybride **ELT
 ## 2. Stack Technique & Décisions d'Ingénierie
 
 ### 2.1. Orchestration — GitHub Actions
-Choisi pour automatiser l'exécution horaire du pipeline ETL (`.github/workflows/pipeline.yml`) de manière 100% autonome, sans surcoût ni gestion d'infrastructure lourde.
+Choisi pour automatiser l'exécution horaire du pipeline ETL (`.github/workflows/pipeline.yml`) de manière 100% et  sans gestion d'infrastructure lourde, tout en bénéficiant de logs d'exécution et d'alertes intégrés en cas d'échec.
 
 ### 2.2. Source de Données — WAQI API
 Sélectionnée car elle fournit des mesures d'indices (AQI) et de polluants atmosphériques (`pm25`, `pm10`, `no2`, `so2`, `co`, `o3`) fiables et standardisées pour les 5 métropoles ciblées.
@@ -62,3 +62,8 @@ Stocke les mesures quantitatives de pollution (valeurs AQI) associées aux clés
 
 ### 4.2. Tables de Dimensions — `dim_city`, `dim_parameter`, `dim_date`
 Mis en place pour séparer les métriques des contextes descriptifs (géographie, typologie des polluants, grain temporel UTC), ce qui optimise les requêtes analytiques et la préparation des données pour l'IA.
+
+
+======> jerena av eo oe aiza ho aiza daoy le zvtr tanisaina reo so hantanina am présentation
+atao ze ville madio au lieu de ville maloto le izy fa azo lazaina ho mitovy ihany
+bien le bonjour
