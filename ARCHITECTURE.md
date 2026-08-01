@@ -63,7 +63,3 @@ Stocke les mesures quantitatives de pollution (valeurs AQI) associées aux clés
 ### 4.2. Tables de Dimensions — `dim_city`, `dim_parameter`, `dim_date`
 Mis en place pour séparer les métriques des contextes descriptifs (géographie, typologie des polluants, grain temporel UTC), ce qui optimise les requêtes analytiques et la préparation des données pour l'IA.
 
-
-======> jerena av eo oe aiza ho aiza daoy le zvtr tanisaina reo so hantanina am présentation
-atao ze ville madio au lieu de ville maloto le izy fa azo lazaina ho mitovy ihany
-bien le bonjour
