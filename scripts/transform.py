@@ -1,118 +1,144 @@
+import json
 import os
+from typing import Any, Dict, List
 import pandas as pd
-from supabase import create_client, Client
-from dotenv import load_dotenv
-from typing import Any, Dict, List, cast
 
-load_dotenv()
+CITIES = ["Paris", "Marseille", "Lyon", "Toulouse", "Nice"]
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+CITY_METADATA = {
+    "Paris": {"country": "France", "latitude": 48.8566, "longitude": 2.3522},
+    "Marseille": {
+        "country": "France",
+        "latitude": 43.2965,
+        "longitude": 5.3698,
+    },
+    "Lyon": {"country": "France", "latitude": 45.7640, "longitude": 4.8357},
+    "Toulouse": {"country": "France", "latitude": 43.6047, "longitude": 1.4442},
+    "Nice": {"country": "France", "latitude": 43.7102, "longitude": 7.2620},
+}
 
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise ValueError("SUPABASE_URL et SUPABASE_KEY doivent être définis dans le fichier .env")
+POLLUTANTS_MAP = {
+    "pm25": "pm2_5",
+    "pm10": "pm10",
+    "no2": "no2",
+    "so2": "so2",
+    "co": "co",
+    "o3": "o3",
+}
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-
-def upsert_dim_city(cities: List[str]) -> Dict[str, int]:
-    records = [{"city_name": c} for c in cities]
-    print(f"  [dim_city] {len(records)} enregistrements à upserter")
-    if records:
-        supabase.table("dim_city").upsert(records, on_conflict="city_name").execute()
-    result = cast(List[Dict[str, Any]], supabase.table("dim_city").select("city_id, city_name").execute().data)
-    print(f"  [dim_city] {len(result)} lignes en base")
-    return {str(row["city_name"]): int(row["city_id"]) for row in result}
-
-
-def upsert_dim_parameter(df: pd.DataFrame) -> Dict[str, int]:
-    params = df[['parameter', 'unit']].drop_duplicates()
-    records = [
-        {"parameter_name": row['parameter'], "unit": row['unit']}
-        for _, row in params.iterrows()
-    ]
-    print(f"  [dim_parameter] {len(records)} enregistrements à upserter")
-    if records:
-        supabase.table("dim_parameter").upsert(records, on_conflict="parameter_name").execute()
-    result = cast(List[Dict[str, Any]], supabase.table("dim_parameter").select("parameter_id, parameter_name").execute().data)
-    print(f"  [dim_parameter] {len(result)} lignes en base")
-    return {str(row["parameter_name"]): int(row["parameter_id"]) for row in result}
+PARAMETER_BOUNDS = {
+    "aqi": (0, 500),
+    "pm2_5": (0, 1000),
+    "pm10": (0, 1000),
+    "no2": (0, 1000),
+    "so2": (0, 2000),
+    "co": (0, 50000),
+    "o3": (0, 1000),
+}
 
 
-def upsert_dim_date(timestamps: pd.Series) -> Dict[pd.Timestamp, int]:
-    unique_ts = pd.to_datetime(timestamps.unique(), utc=True)
-    records = [
-        {
-            "full_timestamp": ts.strftime('%Y-%m-%dT%H:%M:%S%z'),
-            "date": ts.strftime('%Y-%m-%d'),
-            "year": ts.year,
-            "month": ts.month,
-            "day": ts.day,
-            "hour": ts.hour,
-            "day_of_week": ts.dayofweek,
-        }
-        for ts in unique_ts
-    ]
-    print(f"  [dim_date] {len(records)} enregistrements à upserter")
-    if records:
-        supabase.table("dim_date").upsert(records, on_conflict="full_timestamp").execute()
-    result = cast(List[Dict[str, Any]], supabase.table("dim_date").select("date_id, full_timestamp").execute().data)
-    print(f"  [dim_date] {len(result)} lignes en base")
-    return {
-        pd.to_datetime(row["full_timestamp"], utc=True): int(row["date_id"])
-        for row in result
+def clean_outliers(df: pd.DataFrame) -> pd.DataFrame:
+  """Remplace par NaN les valeurs hors bornes sans supprimer toute la ligne de mesure."""
+  for param, (low, high) in PARAMETER_BOUNDS.items():
+    if param in df.columns:
+      mask = (df[param] < low) | (df[param] > high)
+      n_outliers = mask.sum()
+      if n_outliers > 0:
+        print(
+            f"  [outliers] {n_outliers} valeur(s) invalide(s) écartée(s) pour"
+            f" '{param}'"
+        )
+        df.loc[mask, param] = None
+  return df
+
+
+def transform():
+  os.makedirs("clean", exist_ok=True)
+  records: List[Dict[str, Any]] = []
+
+  raw_files = [f for f in os.listdir("raw") if f.endswith(".json")]
+  if not raw_files:
+    print("Aucun fichier brut trouvé dans raw/")
+    return
+
+  for filename in raw_files:
+    filepath = os.path.join("raw", filename)
+    with open(filepath, "r", encoding="utf-8") as f:
+      try:
+        data = json.load(f)
+      except Exception as e:
+        print(f"Erreur de lecture du fichier {filename} : {e}")
+        continue
+
+    city = filename.split("_")[0].capitalize()
+    if city not in CITIES:
+      city_raw = data.get("city", {}).get("name", "")
+      for c in CITIES:
+        if c.lower() in city_raw.lower():
+          city = c
+          break
+
+    if city not in CITIES:
+      continue
+
+    timestamp = data.get("time", {}).get("iso")
+    if not timestamp:
+      continue
+
+    geo = data.get("city", {}).get("geo", [])
+    if isinstance(geo, list) and len(geo) >= 2:
+      lat, lon = geo[0], geo[1]
+    else:
+      lat = CITY_METADATA[city]["latitude"]
+      lon = CITY_METADATA[city]["longitude"]
+
+    record: Dict[str, Any] = {
+        "timestamp": timestamp,
+        "city": city,
+        "latitude": float(lat),
+        "longitude": float(lon),
+        "aqi": data.get("aqi"),
     }
 
+    iaqi = data.get("iaqi", {})
+    for waqi_key, col_name in POLLUTANTS_MAP.items():
+      if waqi_key in iaqi and "v" in iaqi[waqi_key]:
+        record[col_name] = iaqi[waqi_key]["v"]
+      else:
+        record[col_name] = None
 
-def run():
-    data = supabase.table("raw_air_quality").select("*").limit(5000).execute().data
-    df = pd.DataFrame(data)
-    print(f"[raw_air_quality] {len(df)} lignes lues")
+    records.append(record)
 
-    if df.empty:
-        print("Aucune donnée à transformer")
-        return
+  if not records:
+    print("Aucune donnée extraite depuis raw/")
+    return
 
-    df = df.dropna(subset=['value', 'city', 'parameter', 'timestamp'])
-    print(f"[après dropna] {len(df)} lignes restantes")
+  df = pd.DataFrame(records)
 
-    if df.empty:
-        print("Toutes les lignes ont été éliminées par dropna — vérifie les colonnes value/city/parameter/timestamp dans raw_air_quality")
-        return
+  df = df.dropna(subset=["timestamp", "city"])
 
-    df['timestamp'] = pd.to_datetime(df['timestamp'], utc=True)
+  df = clean_outliers(df)
 
-    print("Alimentation des dimensions...")
-    city_map = upsert_dim_city(df['city'].unique().tolist())
-    parameter_map = upsert_dim_parameter(df)
-    date_map = upsert_dim_date(df['timestamp'])
+  dup_mask = df.duplicated(subset=["city", "timestamp"], keep="first")
+  n_dup = dup_mask.sum()
+  if n_dup > 0:
+    print(f"  [doublons] {n_dup} enregistrement(s) en double éliminé(s)")
+    df = df[~dup_mask]
 
-    df['city_id'] = df['city'].map(city_map)
-    df['parameter_id'] = df['parameter'].map(parameter_map)
-    df['date_id'] = df['timestamp'].map(date_map)
+  df["dt_tmp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+  df = df.sort_values("dt_tmp").drop(columns=["dt_tmp"])
 
-    print(f"[mapping] city_id nuls : {df['city_id'].isna().sum()}")
-    print(f"[mapping] parameter_id nuls : {df['parameter_id'].isna().sum()}")
-    print(f"[mapping] date_id nuls : {df['date_id'].isna().sum()}")
+  if df.empty:
+    print("Toutes les données ont été rejetées lors du nettoyage.")
+    return
 
-    fact_df = df[['city_id', 'parameter_id', 'date_id', 'value']].dropna()
-    print(f"[fact_air_quality] {len(fact_df)} lignes prêtes à insérer")
+  clean_path = "clean/clean.csv"
+  df.to_csv(clean_path, index=False)
 
-    if fact_df.empty:
-        print("Aucun enregistrement à insérer dans fact_air_quality après mapping")
-        return
-
-    fact_df = fact_df.where(pd.notnull(fact_df), None)
-    records: List[Dict[str, Any]] = cast(List[Dict[str, Any]], fact_df.to_dict('records'))
-
-    try:
-        supabase.table("fact_air_quality").upsert(
-            records, on_conflict="city_id,parameter_id,date_id"
-        ).execute()
-        print(f"{len(records)} faits upsertés dans le Data Warehouse (modèle en étoile)")
-    except Exception as e:
-        print(f"Erreur lors de l'insertion dans Supabase : {e}")
+  print(f"Fichier clean reconstruit avec succès : {clean_path}")
+  print(f"Total : {len(df)} lignes générées.")
 
 
 if __name__ == "__main__":
-    run()
+  transform()
+

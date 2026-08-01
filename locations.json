@@ -1,7 +1,28 @@
 [
-  { "name": "Antananarivo", "lat": -18.8792, "lon": 47.5079 },
-  { "name": "Toamasina", "lat": -18.1492, "lon": 49.4023 },
-  { "name": "Fianarantsoa", "lat": -21.4536, "lon": 47.0854 },
-  { "name": "Mahajanga", "lat": -15.7167, "lon": 46.3167 },
-  { "name": "Antsiranana", "lat": -12.2787, "lon": 49.2917 }
+  {
+    "name": "Paris",
+    "lat": 48.8566,
+    "lon": 2.3522
+  },
+  {
+    "name": "Lyon",
+    "lat": 45.764,
+    "lon": 4.8357
+  },
+  {
+    "name": "Marseille",
+    "lat": 43.2965,
+    "lon": 5.3698
+  },
+  {
+    "name": "Nice",
+    "lat": 43.7102,
+    "lon": 7.262
+  },
+  {
+    "name": "Toulouse",
+    "lat": 43.6047,
+    "lon": 1.4442
+  }
 ]
+
