@@ -1,0 +1,227 @@
+{
+  "aqi": 33,
+  "idx": 5722,
+  "attributions": [
+    {
+      "url": "https://www.airparif.asso.fr/",
+      "name": "AirParif - Association de surveillance de la qualité de l'air en Île-de-France",
+      "logo": "Paris-Air-Parif.png"
+    },
+    {
+      "url": "http://www.eea.europa.eu/themes/air/",
+      "name": "European Environment Agency",
+      "logo": "Europe-EEA.png"
+    },
+    {
+      "url": "https://waqi.info/",
+      "name": "World Air Quality Index Project"
+    }
+  ],
+  "city": {
+    "geo": [
+      48.856614,
+      2.3522219
+    ],
+    "name": "Paris",
+    "url": "https://aqicn.org/city/paris",
+    "location": ""
+  },
+  "dominentpol": "o3",
+  "iaqi": {
+    "co": {
+      "v": 0.1
+    },
+    "h": {
+      "v": 47
+    },
+    "no2": {
+      "v": 11.8
+    },
+    "o3": {
+      "v": 33.1
+    },
+    "p": {
+      "v": 1018.1
+    },
+    "pm10": {
+      "v": 21
+    },
+    "pm25": {
+      "v": 44
+    },
+    "so2": {
+      "v": 0.6
+    },
+    "t": {
+      "v": 25.9
+    },
+    "w": {
+      "v": 2.8
+    }
+  },
+  "time": {
+    "s": "2026-08-17 12:00:00",
+    "tz": "+02:00",
+    "v": 1786968000,
+    "iso": "2026-08-17T12:00:00+02:00"
+  },
+  "forecast": {
+    "daily": {
+      "o3": [
+        {
+          "avg": 11,
+          "day": "2026-08-17",
+          "max": 18,
+          "min": 5
+        },
+        {
+          "avg": 10,
+          "day": "2026-08-18",
+          "max": 13,
+          "min": 9
+        },
+        {
+          "avg": 7,
+          "day": "2026-08-19",
+          "max": 13,
+          "min": 4
+        },
+        {
+          "avg": 7,
+          "day": "2026-08-20",
+          "max": 14,
+          "min": 3
+        },
+        {
+          "avg": 5,
+          "day": "2026-08-21",
+          "max": 11,
+          "min": 1
+        },
+        {
+          "avg": 1,
+          "day": "2026-08-22",
+          "max": 1,
+          "min": 1
+        }
+      ],
+      "pm10": [
+        {
+          "avg": 11,
+          "day": "2026-08-17",
+          "max": 16,
+          "min": 9
+        },
+        {
+          "avg": 8,
+          "day": "2026-08-18",
+          "max": 9,
+          "min": 5
+        },
+        {
+          "avg": 5,
+          "day": "2026-08-19",
+          "max": 8,
+          "min": 4
+        },
+        {
+          "avg": 7,
+          "day": "2026-08-20",
+          "max": 8,
+          "min": 4
+        },
+        {
+          "avg": 6,
+          "day": "2026-08-21",
+          "max": 9,
+          "min": 4
+        },
+        {
+          "avg": 6,
+          "day": "2026-08-22",
+          "max": 9,
+          "min": 6
+        }
+      ],
+      "pm25": [
+        {
+          "avg": 30,
+          "day": "2026-08-17",
+          "max": 53,
+          "min": 19
+        },
+        {
+          "avg": 16,
+          "day": "2026-08-18",
+          "max": 19,
+          "min": 10
+        },
+        {
+          "avg": 11,
+          "day": "2026-08-19",
+          "max": 16,
+          "min": 6
+        },
+        {
+          "avg": 13,
+          "day": "2026-08-20",
+          "max": 16,
+          "min": 9
+        },
+        {
+          "avg": 11,
+          "day": "2026-08-21",
+          "max": 18,
+          "min": 6
+        },
+        {
+          "avg": 13,
+          "day": "2026-08-22",
+          "max": 19,
+          "min": 13
+        }
+      ],
+      "uvi": [
+        {
+          "avg": 1,
+          "day": "2026-08-17",
+          "max": 6,
+          "min": 0
+        },
+        {
+          "avg": 0,
+          "day": "2026-08-18",
+          "max": 5,
+          "min": 0
+        },
+        {
+          "avg": 0,
+          "day": "2026-08-19",
+          "max": 5,
+          "min": 0
+        },
+        {
+          "avg": 1,
+          "day": "2026-08-20",
+          "max": 5,
+          "min": 0
+        },
+        {
+          "avg": 1,
+          "day": "2026-08-21",
+          "max": 4,
+          "min": 0
+        },
+        {
+          "avg": 0,
+          "day": "2026-08-22",
+          "max": 0,
+          "min": 0
+        }
+      ]
+    }
+  },
+  "debug": {
+    "sync": "2026-08-17T21:10:05+09:00"
+  }
+}
