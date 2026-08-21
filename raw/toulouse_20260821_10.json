@@ -1,0 +1,275 @@
+{
+  "aqi": 25,
+  "idx": 3828,
+  "attributions": [
+    {
+      "url": "https://www.atmo-occitanie.org/",
+      "name": "Observatoire agréé pour assurer la surveillance de la qualité de l’air sur le territoire de la région Occitanie",
+      "logo": "France-Amto.png"
+    },
+    {
+      "url": "http://www.eea.europa.eu/themes/air/",
+      "name": "European Environment Agency",
+      "logo": "Europe-EEA.png"
+    },
+    {
+      "url": "https://waqi.info/",
+      "name": "World Air Quality Index Project"
+    }
+  ],
+  "city": {
+    "geo": [
+      43.5873309,
+      1.444026232
+    ],
+    "name": "Toulouse Berthelot, France",
+    "url": "https://aqicn.org/city/france/midipyrenees/toulouse-berthelot",
+    "location": ""
+  },
+  "dominentpol": "pm25",
+  "iaqi": {
+    "dew": {
+      "v": 16
+    },
+    "h": {
+      "v": 79.5
+    },
+    "no2": {
+      "v": 1.9
+    },
+    "o3": {
+      "v": 23.3
+    },
+    "p": {
+      "v": 1016
+    },
+    "pm10": {
+      "v": 9
+    },
+    "pm25": {
+      "v": 25
+    },
+    "t": {
+      "v": 19.5
+    },
+    "w": {
+      "v": 3.6
+    },
+    "wg": {
+      "v": 9.2
+    }
+  },
+  "time": {
+    "s": "2026-08-21 11:00:00",
+    "tz": "+02:00",
+    "v": 1787310000,
+    "iso": "2026-08-21T11:00:00+02:00"
+  },
+  "forecast": {
+    "daily": {
+      "o3": [
+        {
+          "avg": 12,
+          "day": "2026-08-19",
+          "max": 24,
+          "min": 2
+        },
+        {
+          "avg": 9,
+          "day": "2026-08-20",
+          "max": 12,
+          "min": 7
+        },
+        {
+          "avg": 11,
+          "day": "2026-08-21",
+          "max": 15,
+          "min": 6
+        },
+        {
+          "avg": 7,
+          "day": "2026-08-22",
+          "max": 14,
+          "min": 2
+        },
+        {
+          "avg": 10,
+          "day": "2026-08-23",
+          "max": 18,
+          "min": 3
+        },
+        {
+          "avg": 15,
+          "day": "2026-08-24",
+          "max": 20,
+          "min": 11
+        },
+        {
+          "avg": 14,
+          "day": "2026-08-25",
+          "max": 18,
+          "min": 10
+        },
+        {
+          "avg": 8,
+          "day": "2026-08-26",
+          "max": 8,
+          "min": 6
+        }
+      ],
+      "pm10": [
+        {
+          "avg": 14,
+          "day": "2026-08-19",
+          "max": 17,
+          "min": 11
+        },
+        {
+          "avg": 4,
+          "day": "2026-08-20",
+          "max": 11,
+          "min": 2
+        },
+        {
+          "avg": 4,
+          "day": "2026-08-21",
+          "max": 6,
+          "min": 2
+        },
+        {
+          "avg": 6,
+          "day": "2026-08-22",
+          "max": 7,
+          "min": 4
+        },
+        {
+          "avg": 6,
+          "day": "2026-08-23",
+          "max": 7,
+          "min": 5
+        },
+        {
+          "avg": 9,
+          "day": "2026-08-24",
+          "max": 11,
+          "min": 6
+        },
+        {
+          "avg": 8,
+          "day": "2026-08-25",
+          "max": 13,
+          "min": 6
+        },
+        {
+          "avg": 6,
+          "day": "2026-08-26",
+          "max": 6,
+          "min": 6
+        }
+      ],
+      "pm25": [
+        {
+          "avg": 36,
+          "day": "2026-08-19",
+          "max": 50,
+          "min": 32
+        },
+        {
+          "avg": 10,
+          "day": "2026-08-20",
+          "max": 33,
+          "min": 4
+        },
+        {
+          "avg": 10,
+          "day": "2026-08-21",
+          "max": 15,
+          "min": 3
+        },
+        {
+          "avg": 10,
+          "day": "2026-08-22",
+          "max": 11,
+          "min": 8
+        },
+        {
+          "avg": 14,
+          "day": "2026-08-23",
+          "max": 18,
+          "min": 10
+        },
+        {
+          "avg": 24,
+          "day": "2026-08-24",
+          "max": 28,
+          "min": 18
+        },
+        {
+          "avg": 20,
+          "day": "2026-08-25",
+          "max": 28,
+          "min": 16
+        },
+        {
+          "avg": 17,
+          "day": "2026-08-26",
+          "max": 17,
+          "min": 15
+        }
+      ],
+      "uvi": [
+        {
+          "avg": 1,
+          "day": "2026-08-19",
+          "max": 7,
+          "min": 0
+        },
+        {
+          "avg": 1,
+          "day": "2026-08-20",
+          "max": 6,
+          "min": 0
+        },
+        {
+          "avg": 1,
+          "day": "2026-08-21",
+          "max": 5,
+          "min": 0
+        },
+        {
+          "avg": 1,
+          "day": "2026-08-22",
+          "max": 7,
+          "min": 0
+        },
+        {
+          "avg": 1,
+          "day": "2026-08-23",
+          "max": 7,
+          "min": 0
+        },
+        {
+          "avg": 1,
+          "day": "2026-08-24",
+          "max": 6,
+          "min": 0
+        },
+        {
+          "avg": 1,
+          "day": "2026-08-25",
+          "max": 7,
+          "min": 0
+        },
+        {
+          "avg": 0,
+          "day": "2026-08-26",
+          "max": 0,
+          "min": 0
+        }
+      ]
+    }
+  },
+  "debug": {
+    "sync": "2026-08-21T18:54:51+09:00"
+  }
+}
