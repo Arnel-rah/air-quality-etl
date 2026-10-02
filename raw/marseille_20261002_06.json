@@ -1,0 +1,153 @@
+{
+  "aqi": 46,
+  "idx": 6882,
+  "attributions": [
+    {
+      "url": "http://www.atmosud.org",
+      "name": "L'observatoire de la qualité de l'air en Région Sud Provence-Alpes-Côte d'Azur",
+      "logo": "Paca-Air-Paca.png"
+    },
+    {
+      "url": "https://waqi.info/",
+      "name": "World Air Quality Index Project"
+    }
+  ],
+  "city": {
+    "geo": [
+      43.305287,
+      5.394716
+    ],
+    "name": "Marseille 5 Avenues, PACA, France",
+    "url": "https://aqicn.org/city/france/paca/marseille-5-avenues",
+    "location": ""
+  },
+  "dominentpol": "pm25",
+  "iaqi": {
+    "co": {
+      "v": 0.1
+    },
+    "h": {
+      "v": 94
+    },
+    "no2": {
+      "v": 7.6
+    },
+    "o3": {
+      "v": 8.1
+    },
+    "p": {
+      "v": 1025.8
+    },
+    "pm10": {
+      "v": 20
+    },
+    "pm25": {
+      "v": 46
+    },
+    "so2": {
+      "v": 0.8
+    },
+    "t": {
+      "v": 13.3
+    },
+    "w": {
+      "v": 0.2
+    },
+    "wg": {
+      "v": 0.7
+    }
+  },
+  "time": {
+    "s": "2026-10-02 08:00:00",
+    "tz": "+02:00",
+    "v": 1790928000,
+    "iso": "2026-10-02T08:00:00+02:00"
+  },
+  "forecast": {
+    "daily": {
+      "o3": [
+        {
+          "avg": 20,
+          "day": "2026-09-30",
+          "max": 20,
+          "min": 19
+        },
+        {
+          "avg": 17,
+          "day": "2026-10-01",
+          "max": 20,
+          "min": 12
+        },
+        {
+          "avg": 12,
+          "day": "2026-10-02",
+          "max": 14,
+          "min": 12
+        }
+      ],
+      "pm10": [
+        {
+          "avg": 14,
+          "day": "2026-09-30",
+          "max": 16,
+          "min": 12
+        },
+        {
+          "avg": 16,
+          "day": "2026-10-01",
+          "max": 23,
+          "min": 9
+        },
+        {
+          "avg": 9,
+          "day": "2026-10-02",
+          "max": 9,
+          "min": 8
+        }
+      ],
+      "pm25": [
+        {
+          "avg": 36,
+          "day": "2026-09-30",
+          "max": 38,
+          "min": 30
+        },
+        {
+          "avg": 43,
+          "day": "2026-10-01",
+          "max": 55,
+          "min": 29
+        },
+        {
+          "avg": 30,
+          "day": "2026-10-02",
+          "max": 30,
+          "min": 26
+        }
+      ],
+      "uvi": [
+        {
+          "avg": 0,
+          "day": "2026-09-30",
+          "max": 4,
+          "min": 0
+        },
+        {
+          "avg": 0,
+          "day": "2026-10-01",
+          "max": 2,
+          "min": 0
+        },
+        {
+          "avg": 0,
+          "day": "2026-10-02",
+          "max": 0,
+          "min": 0
+        }
+      ]
+    }
+  },
+  "debug": {
+    "sync": "2026-10-02T15:07:45+09:00"
+  }
+}
