@@ -1,0 +1,155 @@
+{
+  "aqi": 26,
+  "idx": 3828,
+  "attributions": [
+    {
+      "url": "http://www.eea.europa.eu/themes/air/",
+      "name": "European Environment Agency",
+      "logo": "Europe-EEA.png"
+    },
+    {
+      "url": "https://www.atmo-occitanie.org/",
+      "name": "Observatoire agréé pour assurer la surveillance de la qualité de l’air sur le territoire de la région Occitanie",
+      "logo": "France-Amto.png"
+    },
+    {
+      "url": "https://waqi.info/",
+      "name": "World Air Quality Index Project"
+    }
+  ],
+  "city": {
+    "geo": [
+      43.5873309,
+      1.444026232
+    ],
+    "name": "Toulouse Berthelot, France",
+    "url": "https://aqicn.org/city/france/midipyrenees/toulouse-berthelot",
+    "location": ""
+  },
+  "dominentpol": "o3",
+  "iaqi": {
+    "dew": {
+      "v": 15
+    },
+    "h": {
+      "v": 60
+    },
+    "no2": {
+      "v": 5.2
+    },
+    "o3": {
+      "v": 26.4
+    },
+    "p": {
+      "v": 1025
+    },
+    "pm10": {
+      "v": 17
+    },
+    "pm25": {
+      "v": 22
+    },
+    "t": {
+      "v": 23
+    },
+    "w": {
+      "v": 4.1
+    },
+    "wg": {
+      "v": 13.3
+    }
+  },
+  "time": {
+    "s": "2026-10-02 19:00:00",
+    "tz": "+02:00",
+    "v": 1790967600,
+    "iso": "2026-10-02T19:00:00+02:00"
+  },
+  "forecast": {
+    "daily": {
+      "o3": [
+        {
+          "avg": 14,
+          "day": "2026-09-30",
+          "max": 18,
+          "min": 13
+        },
+        {
+          "avg": 9,
+          "day": "2026-10-01",
+          "max": 15,
+          "min": 6
+        },
+        {
+          "avg": 5,
+          "day": "2026-10-02",
+          "max": 5,
+          "min": 4
+        }
+      ],
+      "pm10": [
+        {
+          "avg": 12,
+          "day": "2026-09-30",
+          "max": 18,
+          "min": 8
+        },
+        {
+          "avg": 8,
+          "day": "2026-10-01",
+          "max": 22,
+          "min": 4
+        },
+        {
+          "avg": 6,
+          "day": "2026-10-02",
+          "max": 6,
+          "min": 6
+        }
+      ],
+      "pm25": [
+        {
+          "avg": 30,
+          "day": "2026-09-30",
+          "max": 40,
+          "min": 18
+        },
+        {
+          "avg": 19,
+          "day": "2026-10-01",
+          "max": 52,
+          "min": 8
+        },
+        {
+          "avg": 10,
+          "day": "2026-10-02",
+          "max": 10,
+          "min": 10
+        }
+      ],
+      "uvi": [
+        {
+          "avg": 0,
+          "day": "2026-09-30",
+          "max": 5,
+          "min": 0
+        },
+        {
+          "avg": 0,
+          "day": "2026-10-01",
+          "max": 4,
+          "min": 0
+        },
+        {
+          "avg": 0,
+          "day": "2026-10-02",
+          "max": 0,
+          "min": 0
+        }
+      ]
+    }
+  },
+  "debug": {
+    "sync": "2026-10-03T03:43:47+09:00"
+  }
+}
