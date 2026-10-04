@@ -1,0 +1,102 @@
+{
+  "aqi": 51,
+  "idx": 6886,
+  "attributions": [
+    {
+      "url": "http://www.atmosud.org",
+      "name": "L'observatoire de la qualité de l'air en Région Sud Provence-Alpes-Côte d'Azur",
+      "logo": "Paca-Air-Paca.png"
+    },
+    {
+      "url": "https://waqi.info/",
+      "name": "World Air Quality Index Project"
+    }
+  ],
+  "city": {
+    "geo": [
+      43.702075,
+      7.286256
+    ],
+    "name": "Nice Arson, PACA, France",
+    "url": "https://aqicn.org/city/france/paca/nice-arson",
+    "location": ""
+  },
+  "dominentpol": "pm25",
+  "iaqi": {
+    "dew": {
+      "v": 19
+    },
+    "h": {
+      "v": 78
+    },
+    "no2": {
+      "v": 4.8
+    },
+    "o3": {
+      "v": 40.5
+    },
+    "p": {
+      "v": 1025
+    },
+    "pm10": {
+      "v": 17
+    },
+    "pm25": {
+      "v": 51
+    },
+    "so2": {
+      "v": 1.1
+    },
+    "t": {
+      "v": 23
+    },
+    "w": {
+      "v": 3
+    }
+  },
+  "time": {
+    "s": "2026-10-04 21:00:00",
+    "tz": "+02:00",
+    "v": 1791147600,
+    "iso": "2026-10-04T21:00:00+02:00"
+  },
+  "forecast": {
+    "daily": {
+      "o3": [
+        {
+          "avg": 10,
+          "day": "2026-10-02",
+          "max": 10,
+          "min": 8
+        }
+      ],
+      "pm10": [
+        {
+          "avg": 30,
+          "day": "2026-10-02",
+          "max": 30,
+          "min": 27
+        }
+      ],
+      "pm25": [
+        {
+          "avg": 76,
+          "day": "2026-10-02",
+          "max": 76,
+          "min": 71
+        }
+      ],
+      "uvi": [
+        {
+          "avg": 0,
+          "day": "2026-10-02",
+          "max": 0,
+          "min": 0
+        }
+      ]
+    }
+  },
+  "debug": {
+    "sync": "2026-10-05T04:14:09+09:00"
+  }
+}
