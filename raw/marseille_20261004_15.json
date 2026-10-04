@@ -1,0 +1,105 @@
+{
+  "aqi": 47,
+  "idx": 6882,
+  "attributions": [
+    {
+      "url": "http://www.atmosud.org",
+      "name": "L'observatoire de la qualité de l'air en Région Sud Provence-Alpes-Côte d'Azur",
+      "logo": "Paca-Air-Paca.png"
+    },
+    {
+      "url": "https://waqi.info/",
+      "name": "World Air Quality Index Project"
+    }
+  ],
+  "city": {
+    "geo": [
+      43.305287,
+      5.394716
+    ],
+    "name": "Marseille 5 Avenues, PACA, France",
+    "url": "https://aqicn.org/city/france/paca/marseille-5-avenues",
+    "location": ""
+  },
+  "dominentpol": "o3",
+  "iaqi": {
+    "co": {
+      "v": 0.1
+    },
+    "h": {
+      "v": 53
+    },
+    "no2": {
+      "v": 2.1
+    },
+    "o3": {
+      "v": 46.8
+    },
+    "p": {
+      "v": 1022.9
+    },
+    "pm10": {
+      "v": 14
+    },
+    "pm25": {
+      "v": 35
+    },
+    "so2": {
+      "v": 0.7
+    },
+    "t": {
+      "v": 25
+    },
+    "w": {
+      "v": 2
+    },
+    "wg": {
+      "v": 9
+    }
+  },
+  "time": {
+    "s": "2026-10-04 17:00:00",
+    "tz": "+02:00",
+    "v": 1791133200,
+    "iso": "2026-10-04T17:00:00+02:00"
+  },
+  "forecast": {
+    "daily": {
+      "o3": [
+        {
+          "avg": 12,
+          "day": "2026-10-02",
+          "max": 14,
+          "min": 12
+        }
+      ],
+      "pm10": [
+        {
+          "avg": 9,
+          "day": "2026-10-02",
+          "max": 9,
+          "min": 8
+        }
+      ],
+      "pm25": [
+        {
+          "avg": 30,
+          "day": "2026-10-02",
+          "max": 30,
+          "min": 26
+        }
+      ],
+      "uvi": [
+        {
+          "avg": 0,
+          "day": "2026-10-02",
+          "max": 0,
+          "min": 0
+        }
+      ]
+    }
+  },
+  "debug": {
+    "sync": "2026-10-05T00:04:59+09:00"
+  }
+}
