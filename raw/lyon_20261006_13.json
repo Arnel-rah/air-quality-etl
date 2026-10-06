@@ -1,0 +1,61 @@
+{
+  "aqi": 21,
+  "idx": 10050,
+  "attributions": [
+    {
+      "url": "https://www.atmo-auvergnerhonealpes.fr/",
+      "name": "Observatoire de la qualité de l'air en Auvergne-Rhône-Alpes",
+      "logo": "France-AirRhoneAlpes.png"
+    },
+    {
+      "url": "https://waqi.info/",
+      "name": "World Air Quality Index Project"
+    }
+  ],
+  "city": {
+    "geo": [
+      45.74972628,
+      4.84439392
+    ],
+    "name": "Lyon Trafic Jaurès, France",
+    "url": "https://aqicn.org/city/france/rhonealpes/rhone/lyon-trafic-jaures",
+    "location": ""
+  },
+  "dominentpol": "pm10",
+  "iaqi": {
+    "dew": {
+      "v": 14
+    },
+    "h": {
+      "v": 47
+    },
+    "no2": {
+      "v": 6.8
+    },
+    "p": {
+      "v": 1016
+    },
+    "pm10": {
+      "v": 21
+    },
+    "t": {
+      "v": 26
+    },
+    "w": {
+      "v": 4.1
+    },
+    "wg": {
+      "v": 14.9
+    }
+  },
+  "time": {
+    "s": "2026-10-06 13:00:00",
+    "tz": "+02:00",
+    "v": 1791291600,
+    "iso": "2026-10-06T13:00:00+02:00"
+  },
+  "forecast": {},
+  "debug": {
+    "sync": "2026-10-06T22:53:50+09:00"
+  }
+}
