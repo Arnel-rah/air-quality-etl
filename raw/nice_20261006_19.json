@@ -1,0 +1,67 @@
+{
+  "aqi": 49,
+  "idx": 6886,
+  "attributions": [
+    {
+      "url": "http://www.atmosud.org",
+      "name": "L'observatoire de la qualité de l'air en Région Sud Provence-Alpes-Côte d'Azur",
+      "logo": "Paca-Air-Paca.png"
+    },
+    {
+      "url": "https://waqi.info/",
+      "name": "World Air Quality Index Project"
+    }
+  ],
+  "city": {
+    "geo": [
+      43.702075,
+      7.286256
+    ],
+    "name": "Nice Arson, PACA, France",
+    "url": "https://aqicn.org/city/france/paca/nice-arson",
+    "location": ""
+  },
+  "dominentpol": "pm25",
+  "iaqi": {
+    "dew": {
+      "v": 17
+    },
+    "h": {
+      "v": 68
+    },
+    "no2": {
+      "v": 3.6
+    },
+    "o3": {
+      "v": 41.1
+    },
+    "p": {
+      "v": 1017
+    },
+    "pm10": {
+      "v": 16
+    },
+    "pm25": {
+      "v": 49
+    },
+    "so2": {
+      "v": 1.1
+    },
+    "t": {
+      "v": 23
+    },
+    "w": {
+      "v": 6.6
+    }
+  },
+  "time": {
+    "s": "2026-10-06 21:00:00",
+    "tz": "+02:00",
+    "v": 1791320400,
+    "iso": "2026-10-06T21:00:00+02:00"
+  },
+  "forecast": {},
+  "debug": {
+    "sync": "2026-10-07T04:12:15+09:00"
+  }
+}
